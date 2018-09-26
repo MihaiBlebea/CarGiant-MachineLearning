@@ -1,6 +1,7 @@
 from scraper import scrape_url
 from writer import write_excel, read_excel
 from encoder import encode_to_integer
+from model import save_model, load_model
 
 from sklearn import tree, linear_model
 from sklearn.model_selection import train_test_split
@@ -20,6 +21,8 @@ columns = [
 ]
 
 excel_file = Path('data/car_data.xlsx')
+model_file = Path('data/model')
+
 
 # If excel file exists then take data from excel,
 # If not, then scrape the site
@@ -59,6 +62,14 @@ cls = linear_model.LinearRegression()
 # cls = tree.DecisionTreeClassifier()
 model = cls.fit(df_features_train, df_labels_train)
 
+# Check if the model is saved to disk or not
+if model_file.exists():
+    # Load model from disk file
+    loaded_model = load_model()
+else:
+    # Save the trained model to disk
+    save_model(model)
+
 # Give the model some prediction data labels from testing data
 prediction = cls.predict(df_features_test)
 
@@ -67,3 +78,4 @@ print(Series(prediction))
 print(df_labels_test)
 
 print('Score is ', cls.score(df_features_test, df_labels_test))
+print('Saved model ', loaded_model.score(df_features_test, df_labels_test))
