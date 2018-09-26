@@ -6,7 +6,7 @@ def next_url(root_url, page_cout):
     return root_url + '/page/' + str(page_cout)
 
 
-def scrape_url(url):
+def scrape(url):
     browser = mechanicalsoup.StatefulBrowser()
     browser.open(url)
 

@@ -1,9 +1,9 @@
 from scraper import scrape_url
-from writer import write_excel, read_excel, write_txt, write_csv, read_csv
+from writer import write_excel, read_excel
 from encoder import encode_to_integer
 
-from sklearn import tree
-from sklearn.utils import shuffle
+from sklearn import tree, linear_model
+from sklearn.model_selection import train_test_split
 
 from pandas import Series, DataFrame
 from pathlib import Path
@@ -35,10 +35,6 @@ else:
     # Save data to excel
     write_excel('data/car_data.xlsx', df)
 
-# Shuffle the DataFrame before predicting the price
-df = shuffle(df)
-df = df.reset_index(drop=True)
-
 # Select the columns plus 'Price' from DataFrame
 df_selected = df[columns + ['Price']]
 
@@ -50,32 +46,24 @@ df_features = df_not_null[columns]
 
 # Encode labels from string to integer
 df_features = encode_to_integer(df_features, ['Body Type', 'Fuel', 'Car'])
-print(df_features)
+# print(df_features)
 
-# Select the 'Price' column from the complete DataFrame
+#Select the 'Price' column from the complete DataFrame
 df_labels = df_not_null['Price']
 
-# Figure out how many rows are for training and how many are for testing
-count_rows = len(df_features.index)
-train_length = int(count_rows * 70/100)
-test_length = count_rows - train_length
-
-# Get the DataFrame for training
-df_features_training = df_features[ 0:train_length ]
-df_labels_training = df_labels[ 0:train_length ]
-
-# Get the DataFrame for testing
-df_features_testing = df_features[ train_length:count_rows ]
-df_labels_testing = df_labels[ train_length:count_rows ]
-
+# Split data in train and test
+df_features_train, df_features_test, df_labels_train, df_labels_test = train_test_split(df_features, df_labels, test_size=0.2, shuffle=True)
 
 # Train model with training features and training labels
-cls = tree.DecisionTreeClassifier()
-cls.fit(df_features_training, df_labels_training)
+cls = linear_model.LinearRegression()
+# cls = tree.DecisionTreeClassifier()
+model = cls.fit(df_features_train, df_labels_train)
 
 # Give the model some prediction data labels from testing data
-prediction = cls.predict(df_features_testing)
+prediction = cls.predict(df_features_test)
 
 # Print result and compare testing data with predition
 print(Series(prediction))
-print(df_labels_testing.reindex())
+print(df_labels_test)
+
+print('Score is ', cls.score(df_features_test, df_labels_test))
