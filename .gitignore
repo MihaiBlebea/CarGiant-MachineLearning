@@ -1,4 +1,5 @@
 /venv
-/machine_learning/__pycache__
+/encoder/__pycache__
 /scraper/__pycache__
 /writer/__pycache__
+/data

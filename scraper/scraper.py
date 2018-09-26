@@ -6,7 +6,7 @@ def next_url(root_url, page_cout):
     return root_url + '/page/' + str(page_cout)
 
 
-def parse_url(url):
+def scrape_url(url):
     browser = mechanicalsoup.StatefulBrowser()
     browser.open(url)
 
@@ -17,7 +17,14 @@ def parse_url(url):
     car_array = []
 
     for link in links:
-        browser.open('https://www.cargiant.co.uk' + link.attrs['href'])
+        complete_url = 'https://www.cargiant.co.uk' + link.attrs['href']
+
+        # Check if the request gives back 200 or error
+        response = browser.get(complete_url)
+        if response.status_code == 500:
+            continue
+
+        browser.open(complete_url)
 
         trs = browser.get_current_page().find_all('tr')
         car_details = browser.get_current_page().find('div', class_='car__main-details')
