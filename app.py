@@ -57,6 +57,12 @@ df_labels = df_not_null['Price']
 # Split data in train and test
 df_features_train, df_features_test, df_labels_train, df_labels_test = train_test_split(df_features, df_labels, test_size=0.2, shuffle=True)
 
+# Save all the Data Frames to Excel
+# write_excel('data/df_features_train.xlsx', df_features_train)
+# write_excel('data/df_features_test.xlsx', df_features_test)
+# write_excel('data/df_labels_train.xlsx', df_labels_train)
+# write_excel('data/df_labels_test.xlsx', df_labels_test)
+
 # Check if the model is saved to disk or not
 if model_file.exists():
     # Load model from disk file
