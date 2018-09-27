@@ -2,6 +2,9 @@ import numpy as np
 from pandas import DataFrame, Series
 
 
+# Separate the function that creates the dict from the main encode function
+
+
 def encode_to_integer(df, columns):
     for column in columns:
         df_no_dupli = df.drop_duplicates(column)
