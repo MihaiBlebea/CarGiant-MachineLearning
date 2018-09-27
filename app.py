@@ -21,7 +21,7 @@ columns = [
 ]
 
 excel_file = Path('data/car_data.xlsx')
-model_file = Path('data/model')
+model_file = Path('data/car_price.model')
 
 
 # If excel file exists then take data from excel,
@@ -57,25 +57,24 @@ df_labels = df_not_null['Price']
 # Split data in train and test
 df_features_train, df_features_test, df_labels_train, df_labels_test = train_test_split(df_features, df_labels, test_size=0.2, shuffle=True)
 
-# Train model with training features and training labels
-cls = linear_model.LinearRegression()
-# cls = tree.DecisionTreeClassifier()
-model = cls.fit(df_features_train, df_labels_train)
-
 # Check if the model is saved to disk or not
 if model_file.exists():
     # Load model from disk file
-    loaded_model = load_model()
+    model = load_model()
 else:
+    # Train model with training features and training labels
+    cls = linear_model.LinearRegression()
+    model = cls.fit(df_features_train, df_labels_train)
+
     # Save the trained model to disk
     save_model(model)
 
 # Give the model some prediction data labels from testing data
-prediction = cls.predict(df_features_test)
+prediction = model.predict(df_features_test)
 
 # Print result and compare testing data with predition
 print(Series(prediction))
 print(df_labels_test)
 
-print('Score is ', cls.score(df_features_test, df_labels_test))
-print('Saved model ', loaded_model.score(df_features_test, df_labels_test))
+print('Score is ', model.score(df_features_test, df_labels_test))
+print('Saved model ', model.score(df_features_test, df_labels_test))
