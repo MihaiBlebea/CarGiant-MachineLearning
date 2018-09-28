@@ -21,7 +21,7 @@ def scrape(url):
 
         # Check if the request gives back 200 or error
         response = browser.get(complete_url)
-        if response.status_code == 500:
+        if response.status_code != 200:
             continue
 
         browser.open(complete_url)

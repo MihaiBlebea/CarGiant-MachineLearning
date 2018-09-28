@@ -4,7 +4,7 @@ from scraper.cleaner import remove_money_sign, remove_asterix, remove_comma
 
 def scrape_url(initial_url):
     data = []
-    for i in range(1, 10):
+    for i in range(1, 68):
         print('Started scraping page nr: ' + str(i))
         url = next_url(initial_url, i)
         data = data + scrape(url)
