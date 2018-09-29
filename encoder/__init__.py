@@ -1,1 +1,1 @@
-from encoder.encoder import encode_to_integer
+from encoder.encoder import CGEncode

@@ -1,5 +1,4 @@
 import mechanicalsoup
-# from scraper.cleaner import remove_money_sign, remove_asterix, remove_comma
 
 
 def next_url(root_url, page_cout):

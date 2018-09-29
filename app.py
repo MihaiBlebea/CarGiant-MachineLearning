@@ -1,86 +1,104 @@
 from scraper import scrape_url
 from writer import write_excel, read_excel
-from encoder import encode_to_integer
-from model import save_model, load_model
+from serializer import save_obj, load_obj
 
-from sklearn import tree, linear_model
+from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 
 from pandas import Series, DataFrame
+import numpy as np
 from pathlib import Path
 
 
-initial_url = 'https://www.cargiant.co.uk/search'
+class CGData:
 
-columns = [
-    'Body Type',
-    'Engine size',
-    'Fuel',
-    '0 to 62 mph (secs)',
-    'Car'
-]
+    def __init__(self, url, feature_columns, label_column, encoder):
+        self.feature_columns = feature_columns
+        self.label_column = label_column
+        self.url = url
+        self.encoder = encoder
 
-excel_file = Path('data/car_data.xlsx')
-model_file = Path('data/car_price.model')
+        self.columns = self.feature_columns + [ self.label_column ]
+        self.df = None
 
 
-# If excel file exists then take data from excel,
-# If not, then scrape the site
-if excel_file.exists():
-    df = read_excel('data/car_data.xlsx')
-else:
-    # Scrape site
-    data = scrape_url(initial_url)
+    def load_data(self, file_path):
+        excel_file = Path(file_path)
+        return read_excel(file_path)
 
-    # Transform data to DataFrame
-    df = DataFrame(data)
 
-    # Save data to excel
-    write_excel('data/car_data.xlsx', df)
+    def scrape_data(self):
+        data = scrape_url(self.url)
+        return DataFrame(data)
 
-# Select the columns plus 'Price' from DataFrame
-df_selected = df[columns + ['Price']]
 
-# Take out the incomplete rows from the DataFrame
-df_not_null = df_selected.dropna()
+    def load_or_scrape_data(self, file_path):
 
-# Select columns from the complete DataFrame
-df_features = df_not_null[columns]
+        excel_file = Path(file_path)
 
-# Encode labels from string to integer
-df_features = encode_to_integer(df_features, ['Body Type', 'Fuel', 'Car'])
-# print(df_features)
+        if excel_file.exists():
+            df = self.load_data(file_path)
+        else:
+            df = self.scrape_data()
+            write_excel(file_path, df)
 
-#Select the 'Price' column from the complete DataFrame
-df_labels = df_not_null['Price']
+        df_selected = df[self.columns]
+        self.df = df_selected.dropna()
 
-# Split data in train and test
-df_features_train, df_features_test, df_labels_train, df_labels_test = train_test_split(df_features, df_labels, test_size=0.2, shuffle=True)
 
-# Save all the Data Frames to Excel
-# write_excel('data/df_features_train.xlsx', df_features_train)
-# write_excel('data/df_features_test.xlsx', df_features_test)
-# write_excel('data/df_labels_train.xlsx', df_labels_train)
-# write_excel('data/df_labels_test.xlsx', df_labels_test)
+    def get_features(self):
+        if self.df is None:
+            pass
+        else:
+            df_features = self.df[self.feature_columns]
+            return self.encoder.encode_to_integer(df_features, self.feature_columns)
 
-# Check if the model is saved to disk or not
-if model_file.exists():
-    # Load model from disk file
-    model = load_model()
-else:
-    # Train model with training features and training labels
-    cls = linear_model.LinearRegression()
-    model = cls.fit(df_features_train, df_labels_train)
 
-    # Save the trained model to disk
-    save_model(model)
+    def get_labels(self):
+        if self.df is None:
+            pass
+        else:
+            return self.df[self.label_column]
 
-# Give the model some prediction data labels from testing data
-prediction = model.predict(df_features_test)
 
-# Print result and compare testing data with predition
-print(Series(prediction))
-print(df_labels_test)
+class CGPredict:
 
-print('Score is ', model.score(df_features_test, df_labels_test))
-print('Saved model ', model.score(df_features_test, df_labels_test))
+    def __init__(self, df_features, df_labels):
+        self.df_features_train, self.df_features_test, self.df_labels_train, self.df_labels_test = train_test_split(df_features, df_labels, test_size=0.2, shuffle=True)
+        self.model = None
+
+
+    def train(self):
+        cls = linear_model.LinearRegression()
+        model = cls.fit(self.df_features_train, self.df_labels_train)
+        return model
+
+
+    def train_or_load(self, file_path):
+        model_file = Path(file_path)
+
+        if model_file.exists():
+            model = load_obj(file_path)
+        else:
+            model = self.train()
+            save_obj(model, file_path)
+
+        self.model = model
+
+
+    def predict(self, df_features = None):
+        if df_features == None:
+            df_features = self.df_features_test
+
+        if self.model is None:
+            pass
+        else:
+            prediction = self.model.predict(df_features)
+            return Series(np.array(prediction).astype(int))
+
+
+    def get_score(self):
+        if self.model is None:
+            pass
+        else:
+            return self.model.score(self.df_features_test, self.df_labels_test)
