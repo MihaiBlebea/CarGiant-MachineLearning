@@ -1,6 +1,6 @@
-from scraper import scrape_url
-from writer import write_excel, read_excel
-from serializer import save_obj, load_obj
+from cg_predict_price.scraper import scrape_url
+from cg_predict_price.writer import write_excel, read_excel
+from cg_predict_price.serializer import save_obj, load_obj
 
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
@@ -12,10 +12,11 @@ from pathlib import Path
 
 class CGData:
 
-    def __init__(self, url, feature_columns, label_column, encoder):
+    def __init__(self, url, feature_columns, label_column, encoder, max_pages = 2):
         self.feature_columns = feature_columns
         self.label_column = label_column
         self.url = url
+        self.max_pages = max_pages
         self.encoder = encoder
 
         self.columns = self.feature_columns + [ self.label_column ]
@@ -27,11 +28,6 @@ class CGData:
         return read_excel(file_path)
 
 
-    def scrape_data(self):
-        data = scrape_url(self.url)
-        return DataFrame(data)
-
-
     def load_or_scrape_data(self, file_path):
 
         excel_file = Path(file_path)
@@ -39,7 +35,7 @@ class CGData:
         if excel_file.exists():
             df = self.load_data(file_path)
         else:
-            df = self.scrape_data()
+            df = DataFrame( scrape_url(self.url, self.max_pages) )
             write_excel(file_path, df)
 
         df_selected = df[self.columns]

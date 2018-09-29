@@ -1,10 +1,10 @@
-from scraper.scraper import next_url, scrape
-from scraper.cleaner import remove_money_sign, remove_asterix, remove_comma
+from cg_predict_price.scraper.scraper import next_url, scrape
+from cg_predict_price.scraper.cleaner import remove_money_sign, remove_asterix, remove_comma
 
 
-def scrape_url(initial_url):
+def scrape_url(initial_url, max_pages):
     data = []
-    for i in range(1, 2):
+    for i in range(1, max_pages):
         print('Started scraping page nr: ' + str(i))
         url = next_url(initial_url, i)
         data = data + scrape(url)

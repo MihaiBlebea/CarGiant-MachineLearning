@@ -1,7 +1,7 @@
 /venv
-/__pycache__
-/encoder/__pycache__
-/scraper/__pycache__
-/writer/__pycache__
-/model/__pycache__
-/data
+/cg_predict_price/__pycache__
+/cg_predict_price/encoder/__pycache__
+/cg_predict_price/scraper/__pycache__
+/cg_predict_price/writer/__pycache__
+/cg_predict_price/serializer/__pycache__
+/cg_predict_price/data
