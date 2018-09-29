@@ -1,4 +1,4 @@
-# Good blogs and documentation
+c:\Users\Serban\AppData\Roaming\Python\Python36\Scripts\twine.exe upload --repository-url https://test.pypi.org/legacy/ dist/*
 
-- linear regression: "https://towardsdatascience.com/linear-regression-the-easier-way-6f941aa471ea"
-- machine learning series on Medium: "https://medium.com/@ageitgey/machine-learning-is-fun-part-2-a26a10b68df3"
+Run this first: python setup.py sdist bdist_wheel
+Working with: c:\Users\Serban\AppData\Roaming\Python\Python36\Scripts\twine.exe upload dist/*

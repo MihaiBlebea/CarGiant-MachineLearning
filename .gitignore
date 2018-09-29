@@ -5,3 +5,7 @@
 /cg_predict_price/writer/__pycache__
 /cg_predict_price/serializer/__pycache__
 /cg_predict_price/data
+
+/build
+/dist
+/cg_predict_price.egg-info
