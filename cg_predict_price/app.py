@@ -83,7 +83,7 @@ class CGPredict:
 
 
     def predict(self, df_features = None):
-        if df_features == None:
+        if df_features is None:
             df_features = self.df_features_test
 
         if self.model is None:
